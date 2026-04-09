@@ -19,10 +19,10 @@ namespace ticketProject.src.Models
     }
     internal class Ticket
     {
-        public required int id_ticket {get;set;}
+        public int id_ticket {get;set;}
         public required string titulo { get; set; }
         public required string descricao { get; set; }
-        public required StatusTicket status { get; set; }
+        public StatusTicket status { get; set; }
         public required PrioridadeTicket prioridade {get; set;}
         public DateTime? data_fechamento {get; set; }
         public required int id_usuario {get; set;}
