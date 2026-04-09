@@ -26,7 +26,7 @@ namespace ticketProject.src.Models
         public required PrioridadeTicket prioridade {get; set;}
         public DateTime? data_fechamento {get; set; }
         public required int id_usuario {get; set;}
-        public required int id_usuario_responsavel {get; set;}
+        public int id_usuario_responsavel {get; set;}
         public required int id_categoria {get; set;}
     }
 }
