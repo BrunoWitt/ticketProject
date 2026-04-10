@@ -92,6 +92,8 @@ namespace ticketProject.src.Repositories
 
 
         public List<Ticket> GetTickets(TicketFilter filter)
+        ///
+        /// Pega os tickets de acordo com um filtro - Facilitar para os diferentes tipos de pesquisa que eu possa fazer no futuro(não necessáriamente criar uma pesquisa com filtro ali) 
         {
             var tickets = new List<Ticket>();
 
@@ -180,6 +182,9 @@ namespace ticketProject.src.Repositories
 
 
     public void UpdateStatus(int id_ticket, StatusTicket newStatus)
+    ///
+    /// Realiza o update do status para um ticket especifico
+    /// 
         {
             try
             {
