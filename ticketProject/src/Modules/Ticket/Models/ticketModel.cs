@@ -17,7 +17,7 @@ namespace ticketProject.src.Models
         media,
         alta   
     }
-    internal class Ticket
+    public class Ticket
     {
         public int id_ticket {get;set;}
         public required string titulo { get; set; }

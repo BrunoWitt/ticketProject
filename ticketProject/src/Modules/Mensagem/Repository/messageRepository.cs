@@ -1,13 +1,14 @@
 using Npgsql;
 using ticketProject.src.Database;
 using ticketProject.src.Models;
+using ticketProject.src.Modules.Mensagem.Repository;
 
 namespace ticketProject.src.Repositories
 {
-    internal class MessageRepository
+    public class MessageRepository : IMessageRepository
     {
         //Crudzão
-        public void SendMessage(Message mensagem)
+        public async Task SendMessage(Message mensagem)
         {
             ///
             /// Função responsável por colocar a mensagem no banco de dados de um chamado especifico
@@ -25,7 +26,7 @@ namespace ticketProject.src.Repositories
                 cmd.Parameters.AddWithValue("id_usuario", mensagem.id_usuario);
                 cmd.Parameters.AddWithValue("id_ticket", mensagem.id_ticket);
 
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             catch (Exception ex)
             {
@@ -35,7 +36,7 @@ namespace ticketProject.src.Repositories
         }
 
 
-        public List<Message> ReadAllMessagesFromTicket(Ticket ticket)
+        public async Task<List<Message>> ReadAllMessagesFromTicket(Ticket ticket)
         {
             var messageList = new List<Message>();
 
@@ -49,7 +50,7 @@ namespace ticketProject.src.Repositories
                 using var cmd = new NpgsqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("id_ticket", ticket.id_ticket);
 
-                using var reader = cmd.ExecuteReader();
+                using var reader = await cmd.ExecuteReaderAsync();
 
                 while (reader.Read())
                 {

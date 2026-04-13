@@ -2,7 +2,7 @@ using System;
 
 namespace ticketProject.src.Models
 {
-    internal class Message
+    public class Message
     {
         public required int id_mensagem {get; set;}
         public required string texto {get; set;}

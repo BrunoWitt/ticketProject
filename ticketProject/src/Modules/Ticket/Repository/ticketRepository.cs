@@ -11,7 +11,7 @@ namespace ticketProject.src.Repositories
 {
     internal class TicketRepository
     {
-        public void CreateTicket(Ticket ticket)
+        public void CreateTicketDB(Ticket ticket)
         {
             /// <summary>
             /// Usuário cria o ticket no banco de dados
@@ -48,7 +48,7 @@ namespace ticketProject.src.Repositories
         }
 
 
-        public List<Ticket> ReadAllTickets()
+        public List<Ticket> ReadAllTicketsDB()
         {
             var ticketList = new List<Ticket>();
 
@@ -91,7 +91,7 @@ namespace ticketProject.src.Repositories
         }
 
 
-        public List<Ticket> GetTickets(TicketFilter filter)
+        public List<Ticket> GetTicketsDB(TicketFilter filter)
         ///
         /// Pega os tickets de acordo com um filtro - Facilitar para os diferentes tipos de pesquisa que eu possa fazer no futuro(não necessáriamente criar uma pesquisa com filtro ali) 
         {
@@ -181,7 +181,7 @@ namespace ticketProject.src.Repositories
     }
 
 
-    public void UpdateStatus(int id_ticket, StatusTicket newStatus)
+    public void UpdateStatusDB(int id_ticket, StatusTicket newStatus)
     ///
     /// Realiza o update do status para um ticket especifico
     /// 
