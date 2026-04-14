@@ -3,13 +3,14 @@ using System.Data.SqlTypes;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Npgsql;
 
+using ticketProject.src.Modules.Repository;
 using ticketProject.src.Database;
 using ticketProject.src.Models;
 using ticketProject.src.Services.Filter;
 
 namespace ticketProject.src.Repositories
 {
-    internal class TicketRepository
+    public class TicketRepository : ITicketRepository
     {
         public void CreateTicketDB(Ticket ticket)
         {
@@ -25,7 +26,7 @@ namespace ticketProject.src.Repositories
                     INSERT INTO ticket 
                     (titulo, descricao, status, prioridade, id_usuario, id_usuario_responsavel, id_categoria)
                     VALUES 
-                    (@titulo, @descricao, @status, @prioridade, @id_usuario, @id_usuario_responsavel, @id_categoria);
+                    (@titulo, @descricao, @status::status_ticket, @prioridade::prioridade_ticket, @id_usuario, @id_usuario_responsavel, @id_categoria);
                 ";
 
                 using var cmd = new NpgsqlCommand(query, conn);
@@ -35,7 +36,7 @@ namespace ticketProject.src.Repositories
                 cmd.Parameters.AddWithValue("status", ticket.status.ToString());
                 cmd.Parameters.AddWithValue("prioridade", ticket.prioridade.ToString());
                 cmd.Parameters.AddWithValue("id_usuario", ticket.id_usuario);
-                cmd.Parameters.AddWithValue("id_usuario_responsavel", ticket.id_usuario_responsavel);
+                cmd.Parameters.AddWithValue("id_usuario_responsavel", ticket.id_usuario_responsavel.HasValue? ticket.id_usuario_responsavel.Value : DBNull.Value);
                 cmd.Parameters.AddWithValue("id_categoria", ticket.id_categoria);
 
                 cmd.ExecuteNonQuery();
@@ -75,7 +76,9 @@ namespace ticketProject.src.Repositories
                             ? null
                             : reader.GetDateTime(reader.GetOrdinal("data_fechamento")),
                         id_usuario = reader.GetInt32(reader.GetOrdinal("id_usuario")),
-                        id_usuario_responsavel = reader.GetInt32(reader.GetOrdinal("id_usuario_responsavel")),
+                        id_usuario_responsavel = reader.IsDBNull(reader.GetOrdinal("id_usuario_responsavel"))
+                            ? null
+                            : reader.GetInt32(reader.GetOrdinal("id_usuario_responsavel")),
                         id_categoria = reader.GetInt32(reader.GetOrdinal("id_categoria"))
                     };
 

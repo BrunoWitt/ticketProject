@@ -12,11 +12,9 @@ namespace ticketProject.src.Modules.Mensagem.Services
         }
 
         
-        public async Task<List<Message>> loadMessages(Ticket Ticket)
+        public async Task<List<Message>> loadMessages(int ticketId)
         {
-            var messages = await _repo.ReadAllMessagesFromTicket(Ticket);
-
-            return messages;
+            return await _repo.ReadAllMessagesFromTicket(ticketId);
         }
 
 

@@ -2,6 +2,7 @@ namespace ticketProject.src.Modules.Usuario.Repository
 {
     public interface IUsuarioRepository
     {
-        Task<Models.Usuario?> ValidadeUserLoginDB(string emailInput, string passwordHash);
+        Task<Models.Usuario?> GetByEmail(string emailInput);
+        Task CreateUser(string nome, string email, string senha, Models.PerfilUsuario perfil_usuario);
     }
 }

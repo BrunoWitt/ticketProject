@@ -38,3 +38,11 @@ C:\Users\desen\Documents\ticketProject\ticketProject\obj\Debug\net10.0\refint\ti
 C:\Users\desen\Documents\ticketProject\ticketProject\obj\Debug\net10.0\ticketProject.pdb
 C:\Users\desen\Documents\ticketProject\ticketProject\obj\Debug\net10.0\ticketProject.genruntimeconfig.cache
 C:\Users\desen\Documents\ticketProject\ticketProject\obj\Debug\net10.0\ref\ticketProject.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\desen\Documents\ticketProject\ticketProject\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll

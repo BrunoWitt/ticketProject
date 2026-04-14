@@ -1,5 +1,8 @@
 using ticketProject.src.Database;
 using Npgsql;
+using ticketProject.src.Modules.Usuario.Models;
+using ticketProject.src.Modules.Usuario.DTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace ticketProject.src.Modules.Usuario.Repository 
 {
@@ -8,48 +11,69 @@ namespace ticketProject.src.Modules.Usuario.Repository
         //loggin
         //listar todos os usuários
         //get informações
-        public async Task<Models.Usuario?> ValidadeUserLoginDB(string emailInput, string passwordHash)
+        public async Task<Models.Usuario?> GetByEmail(string emailInput)
         {
             try
             {
                 using var conn = DataBaseController.GetConnection();
                 conn.Open();
 
-                var query = @"SELECT id_usuario, nome, email, perfil_usuario FROM usuario WHERE email = @email AND senha = @passwordHash LIMIT 1";
+                var query = @"SELECT id_usuario, nome, email, senha, perfil_usuario FROM usuario WHERE email = @email LIMIT 1";
 
                 using var cmd = new NpgsqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("email", emailInput);
-                cmd.Parameters.AddWithValue("passwordHash", passwordHash);
 
                 await using var reader = await cmd.ExecuteReaderAsync();
 
                 if (await reader.ReadAsync())
                 {
-                    var id_user = reader.GetInt32(0);
-                    var name = reader.GetString(1);
-                    var perfil_user_str = reader.GetString(3);
-
-                    var perfil_user = Enum.Parse<Models.PerfilUsuario>(perfil_user_str);
-
-                    var usuario = new Models.Usuario()
+                    return new Models.Usuario()
                     {
-                        id_usuario = id_user,
-                        nome = name,
-                        email = emailInput,
-                        senha = passwordHash,
-                        perfil_usuario = perfil_user
+                        id_usuario = reader.GetInt32(0),
+                        nome = reader.GetString(1),
+                        email = reader.GetString(2),
+                        senha = reader.GetString(3),
+                        perfil_usuario = Enum.Parse<Models.PerfilUsuario>(reader.GetString(4))
                     };
-
-                    return usuario;
                 }
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+            
+            return null;
+        }
+
+
+        public async Task CreateUser(string nome, string email, string senha, Models.PerfilUsuario perfil_usuario)
+        {
+            try
+            {
+                using var conn = DataBaseController.GetConnection();
+                await conn.OpenAsync();
+
+                var hasher = new PasswordHasher<Models.Usuario>();
+                var senhaHash = hasher.HashPassword(new Models.Usuario(), senha);
+
+                string query = "INSERT INTO usuario (nome, email, senha, perfil_usuario) " +
+                    "VALUES (@nome, @email, @senha, @perfil_usuario::perfil_usuario_enum)";
+
+                using var cmd = new NpgsqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("nome", nome);
+                cmd.Parameters.AddWithValue("email", email);
+                cmd.Parameters.AddWithValue("senha", senhaHash);
+                cmd.Parameters.AddWithValue("perfil_usuario", perfil_usuario.ToString());
+
+                await cmd.ExecuteNonQueryAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 throw;
             }
-
-            return null;
         }
+
     }
 }
