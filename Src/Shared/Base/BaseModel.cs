@@ -1,6 +1,6 @@
 namespace Src.Shared.Base;
 
-public class BaseModel
+public abstract class BaseModel
 {
     public int Id {get;set;}
 
