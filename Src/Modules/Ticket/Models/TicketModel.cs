@@ -18,6 +18,7 @@ public enum PrioridadeTicket
     alta
 }
 
+
 public class TicketModel : BaseModel
 {
     public string? Titulo {get;set;}

@@ -1,14 +1,15 @@
 using Src.Modules.Ticket.Repository;
 using Src.Modules.Ticket.Models;
 using Src.Modules.Ticket.DTOs;
+using Src.Modules.User.Models;
 
 namespace Src.Modules.Ticket.Service
 {
     public class TicketService
     {
-        private readonly TicketRepository _repo;
+        private readonly ITicketRepository _repo;
 
-        public TicketService(TicketRepository repo)
+        public TicketService(ITicketRepository repo)
         {
             _repo = repo;
         }
@@ -34,9 +35,22 @@ namespace Src.Modules.Ticket.Service
             await _repo.Delete(id);
         }
 
-        public async Task Assign(int idTicket, int idAtendente)
+        public async Task Assign(int idTicket, int idAtendente, int usuarioLogadoId, PerfilUsuario perfil)
         {
-            // regra: ao assumir → vira EM_ANDAMENTO
+            if (perfil != PerfilUsuario.atendente)
+                throw new Exception("Apenas atendentes podem assumir tickets");
+
+            var ticket = await _repo.GetById(idTicket);
+
+            if (ticket == null)
+                throw new Exception("Ticket não encontrado");
+
+            if (ticket.IdAtendente != null)
+                throw new Exception("Ticket já possui um responsável");
+
+            if (ticket.Status == StatusTicket.fechado)
+                throw new Exception("Não é possível assumir um ticket fechado");
+
             await _repo.Assign(idTicket, idAtendente);
         }
     }

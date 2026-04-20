@@ -30,5 +30,5 @@ namespace Src.Modules.Message.Service
         {
             return await _repo.GetByTicket(idTicket);
         }
-    }
+    }   
 }

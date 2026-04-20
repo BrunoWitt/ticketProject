@@ -1,13 +1,14 @@
 using Src.Modules.Ticket.Models;
 using Src.Shared.DataBase;
 using Npgsql;
+using Microsoft.Extensions.Primitives;
 
 namespace Src.Modules.Ticket.Repository
 {
     
     public class TicketRepository : ITicketRepository
     {
-        public async Task Create(TicketModel ticket)
+        public async Task Create(string Titulo, string Descricao, PrioridadeTicket Prioridade, int IdUsuario, int? IdCategoria)
         {
             using var conn = DatabaseConnection.GetConnection();
             await conn.OpenAsync();
@@ -19,11 +20,11 @@ namespace Src.Modules.Ticket.Repository
             ";
 
             using var cmd = new NpgsqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("titulo", ticket.Titulo ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("descricao", ticket.Descricao ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("prioridade", ticket.Prioridade.ToString());
-            cmd.Parameters.AddWithValue("idUsuario", ticket.IdUsuario ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("idCategoria", ticket.IdCategoria ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("titulo", Titulo ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("descricao", Descricao ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("prioridade", Prioridade.ToString());
+            cmd.Parameters.AddWithValue("idUsuario", IdUsuario);
+            cmd.Parameters.AddWithValue("idCategoria", (object?)IdCategoria ?? DBNull.Value);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -69,7 +70,7 @@ namespace Src.Modules.Ticket.Repository
         }
 
 
-        public async Task Update(TicketModel ticket)
+        public async Task Update(int Id, string? Titulo, string? Descricao, PrioridadeTicket? Prioridade)
         {   
             using var conn = DatabaseConnection.GetConnection();
             await conn.OpenAsync();
@@ -83,10 +84,10 @@ namespace Src.Modules.Ticket.Repository
             ";
 
             using var cmd = new NpgsqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("id", ticket.Id);
-            cmd.Parameters.AddWithValue("titulo", (object?)ticket.Titulo ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("descricao", (object?)ticket.Descricao ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("prioridade", (object?)ticket.Prioridade.ToString() ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("id", Id);
+            cmd.Parameters.AddWithValue("titulo", (object?)Titulo ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("descricao", (object?)Descricao ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("prioridade", (object?)Prioridade.ToString() ?? DBNull.Value);
 
             await cmd.ExecuteNonQueryAsync();
         }

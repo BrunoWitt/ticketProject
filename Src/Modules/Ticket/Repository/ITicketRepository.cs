@@ -4,13 +4,13 @@ namespace Src.Modules.Ticket.Repository
 {
     public interface ITicketRepository
     {
-        Task Create(TicketModel ticket);
+        Task Create(string Titulo, string Descricao, PrioridadeTicket Prioridade, int IdUsuario, int? IdCategoria);
 
         Task<List<TicketModel>> GetAll();
 
         Task<TicketModel?> GetById(int id);
 
-        Task Update(TicketModel ticket);
+        Task Update(int Id, string? Titulo, string? Descricao, PrioridadeTicket? Prioridade);
 
         Task Delete(int id);
 

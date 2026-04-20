@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Src.Modules.Ticket.Service;
 using Src.Modules.Ticket.DTOs;
 using Src.Modules.Ticket.Models;
+using Src.Modules.User.Models;
+using System.Security.Claims;
 
 namespace Src.Modules.Ticket.Controller
 {
@@ -57,8 +59,18 @@ namespace Src.Modules.Ticket.Controller
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignTicketDTO dto)
         {
-            await _service.Assign(dto.IdTicket, dto.IdAtendente);
-            return Ok();
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            if (userIdClaim == null || roleClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim.Value);
+            var perfil = Enum.Parse<PerfilUsuario>(roleClaim.Value);
+
+            await _service.Assign(dto.IdTicket, dto.IdAtendente, userId, perfil);
+
+            return Ok(new { message = "Ticket atribuído com sucesso" });
         }
     }
 }

@@ -1,4 +1,5 @@
 using Src.Modules.Ticket.Models;
+using Src.Modules.User.Models;
 
 namespace Src.Modules.Ticket.DTOs;
 
