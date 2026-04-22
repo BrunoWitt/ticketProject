@@ -25,3 +25,13 @@ public class AssignTicketDTO
     public required int IdTicket { get; set; }
     public required int IdAtendente { get; set; }
 }
+
+public class TicketResponseDTO
+{
+    public int Id { get; set; }
+    public string? Titulo { get; set; }
+    public string? Descricao { get; set; }
+    public StatusTicket Status { get; set; }
+    public PrioridadeTicket Prioridade { get; set; }
+    public bool Atrasado { get; set; }
+}

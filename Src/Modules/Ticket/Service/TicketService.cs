@@ -111,5 +111,37 @@ namespace Src.Modules.Ticket.Service
 
             await _repo.UpdateStatus(idTicket, StatusTicket.aberto);
         }
+
+
+        public bool ItsLate(TicketModel ticket)
+        {
+            var limitHours = ticket.Prioridade switch
+            {
+                PrioridadeTicket.baixa => 48,
+                PrioridadeTicket.média => 24,
+                PrioridadeTicket.alta => 4,
+                _ => 24
+            };
+
+            var deadline = ticket.DataHoraCriado.AddHours(limitHours);
+
+            return DateTime.UtcNow > deadline && ticket.Status != StatusTicket.fechado;
+        }
+
+
+        public async Task<List<TicketResponseDTO>> GetAllWithSLA()
+        {
+            var tickets = await _repo.GetAll();
+
+            return tickets.Select(t => new TicketResponseDTO
+            {
+                Id = t.Id,
+                Titulo = t.Titulo,
+                Descricao = t.Descricao,
+                Status = t.Status,
+                Prioridade = t.Prioridade,
+                Atrasado = ItsLate(t)
+            }).ToList();
+        }
     }
 }

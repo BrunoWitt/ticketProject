@@ -28,9 +28,9 @@ namespace Src.Modules.Ticket.Controller
 
 
         [HttpGet("all")]
-        public async Task<ActionResult<List<TicketModel>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(await _service.GetAll());
+            return Ok(await _service.GetAllWithSLA());
         }
 
 
