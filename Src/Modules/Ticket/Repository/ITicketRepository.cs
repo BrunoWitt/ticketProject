@@ -12,6 +12,8 @@ namespace Src.Modules.Ticket.Repository
 
         Task Update(int Id, string? Titulo, string? Descricao, PrioridadeTicket? Prioridade);
 
+        Task UpdateStatus(int idTicket, StatusTicket newStatus);
+
         Task Delete(int id);
 
         Task Assign(int ticketId, int atendenteId);

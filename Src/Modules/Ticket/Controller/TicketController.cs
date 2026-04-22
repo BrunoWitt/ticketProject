@@ -18,6 +18,7 @@ namespace Src.Modules.Ticket.Controller
             _service = service;
         }
 
+
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateTicketDTO dto)
         {
@@ -25,11 +26,13 @@ namespace Src.Modules.Ticket.Controller
             return Ok();
         }
 
+
         [HttpGet("all")]
         public async Task<ActionResult<List<TicketModel>>> GetAll()
         {
             return Ok(await _service.GetAll());
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TicketModel>> GetById(int id)
@@ -42,6 +45,7 @@ namespace Src.Modules.Ticket.Controller
             return Ok(ticket);
         }
 
+
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateTicketDTO dto)
         {
@@ -49,12 +53,14 @@ namespace Src.Modules.Ticket.Controller
             return Ok();
         }
 
+
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.Delete(id);
             return NoContent();
         }
+
 
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignTicketDTO dto)
@@ -71,6 +77,42 @@ namespace Src.Modules.Ticket.Controller
             await _service.Assign(dto.IdTicket, dto.IdAtendente, userId, perfil);
 
             return Ok(new { message = "Ticket atribuído com sucesso" });
+        }
+
+
+        [HttpPut("status")]
+        public async Task<IActionResult> ChangeStatus(int id, StatusTicket status)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var perfil = Enum.Parse<PerfilUsuario>(User.FindFirst(ClaimTypes.Role)!.Value);
+
+            await _service.ChangeStatus(id, status, userId, perfil);
+
+            return Ok();
+        }
+
+
+        [HttpPost("close/{id}")]
+        public async Task<IActionResult> Close(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var perfil = Enum.Parse<PerfilUsuario>(User.FindFirst(ClaimTypes.Role)!.Value);
+
+            await _service.Close(id, userId, perfil);
+
+            return Ok(new { message = "Ticket fechado" });
+        }
+
+
+        [HttpPost("reopen/{id}")]
+        public async Task<IActionResult> Reopen(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var perfil = Enum.Parse<PerfilUsuario>(User.FindFirst(ClaimTypes.Role)!.Value);
+
+            await _service.Reopen(id, userId, perfil);
+
+            return Ok(new { message = "Ticket reaberto" });
         }
     }
 }

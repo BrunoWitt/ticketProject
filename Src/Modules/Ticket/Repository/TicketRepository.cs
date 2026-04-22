@@ -93,6 +93,21 @@ namespace Src.Modules.Ticket.Repository
         }
 
 
+        public async Task UpdateStatus(int id, StatusTicket newStatus)
+        {
+            using var conn = DatabaseConnection.GetConnection();
+            await conn.OpenAsync();
+
+            var query = @"UPDATE ticket SET status = @status WHERE id_ticket = @id";
+
+            using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("id", id);
+            cmd.Parameters.AddWithValue("status", newStatus.ToString());
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+
         public async Task Delete(int id)
         {
             using var conn = DatabaseConnection.GetConnection();
