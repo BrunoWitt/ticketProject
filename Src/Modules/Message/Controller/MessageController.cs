@@ -39,5 +39,31 @@ namespace Src.Modules.Message.Controller
 
             return Ok(messages);
         }
+
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> Upload([FromForm] AnexoDTO dto)
+        {
+            if (dto.Arquivo == null || dto.Arquivo.Length == 0)
+                return BadRequest("Arquivo inválido");
+
+            using var memoryStream = new MemoryStream();
+            await dto.Arquivo.CopyToAsync(memoryStream);
+
+            var bytes = memoryStream.ToArray();
+
+            await _service.Anexo(dto.IdMensagem, bytes, dto.Arquivo.ContentType);
+
+            return Ok("Arquivo enviado com sucesso");
+        }
+
+
+        [HttpGet("anexo/{id}")]
+        public async Task<IActionResult> Download(int id)
+        {
+            var anexo = await _service.GetAnexo(id);
+
+            return File(anexo.Arquivo, anexo.Tipo);
+        }
     }
 }

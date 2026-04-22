@@ -8,6 +8,10 @@ namespace Src.Modules.Message.Repository
 
         Task<List<MessageModel>> GetByTicket(int ticketId);
 
+        Task CreateAnexo(int idMensagem, byte[] arquivo, string tipo);
+
+        Task <AnexoModel?> GetAnexo(int id);
+
         Task Delete(long id); 
     }
 }

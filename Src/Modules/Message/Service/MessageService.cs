@@ -26,9 +26,31 @@ namespace Src.Modules.Message.Service
             return message;
         }
 
+
         public async Task<List<MessageModel>> GetMessagesByTicket(int idTicket)
         {
             return await _repo.GetByTicket(idTicket);
         }
+
+
+        public async Task Anexo(int idMensagem, byte[] arquivo, string tipo)
+        {
+            if (arquivo.Length > 5 * 1024 * 1024)
+                throw new Exception ("Arquivo muito grande");
+
+            await _repo.CreateAnexo(idMensagem, arquivo, tipo);
+        }
+
+
+        public async Task<AnexoModel> GetAnexo(int id)
+        {
+            var anexo = await _repo.GetAnexo(id);
+
+            if (anexo == null)
+                throw new Exception("Anexo não encontrado");
+
+            return anexo;
+        }
+        
     }   
 }
