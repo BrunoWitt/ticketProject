@@ -9,6 +9,7 @@ using Src.Modules.Message.Repository;
 using Src.Modules.Message.Service;
 using DotNetEnv;
 using Src.Shared.Authentication;
+using Microsoft.OpenApi.Models;
 
 namespace Src.Configurations;
 
@@ -19,7 +20,34 @@ public static class ApiConfig
         builder.Services.AddControllers();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+
+        builder.Services.AddSwaggerGen(options =>
+{
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Digite: Bearer {seu token}"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] {}
+            }
+        });
+    });
 
         builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
