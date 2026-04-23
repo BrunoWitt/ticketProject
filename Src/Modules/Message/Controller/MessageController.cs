@@ -17,15 +17,15 @@ namespace Src.Modules.Message.Controller
 
 
         [HttpPost]
-        public async Task<IActionResult> Send([FromBody] MessageModel model)
+        public async Task<IActionResult> Send([FromBody] MenssageDTO dto)
         {
-            if (string.IsNullOrWhiteSpace(model.Texto))
+            if (string.IsNullOrWhiteSpace(dto.Texto))
                 return BadRequest("Texto é obrigatório");
 
             var message = await _service.SendMessage(
-                model.Texto,
-                model.IdUsuario,
-                model.IdTicket
+                dto.Texto,
+                dto.IdUsuario,
+                dto.IdTicket
             );
 
             return Ok(message);
