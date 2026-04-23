@@ -20,13 +20,13 @@ namespace Src.Modules.User.Repository
                 using var conn = DatabaseConnection.GetConnection();
                 await conn.OpenAsync();
 
-                string query = "INSERT INTO usuario (nome, email, senha, perfil_usuario) VALUES (@nome, @email, @senha, @perfil_usuario::perfil_usuario)";
+                string query = "INSERT INTO usuario (nome, email, senha, perfil) VALUES (@nome, @email, @senha, @perfil::perfil_usuario)";
 
                 using var cmd = new NpgsqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("nome", nome);
                 cmd.Parameters.AddWithValue("email", email);
                 cmd.Parameters.AddWithValue("senha", senhaHash);
-                cmd.Parameters.AddWithValue("perfil_usuario", perfilUsuario.ToString());
+                cmd.Parameters.AddWithValue("perfil", perfilUsuario.ToString());
 
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -89,7 +89,7 @@ namespace Src.Modules.User.Repository
                         nome = @nome,
                         email = @email,
                         senha = @senha,
-                        perfil_usuario = @perfil_usuario::perfil_usuario
+                        perfil = @perfil_usuario::perfil_usuario
                     WHERE id_usuario = @id;
                 ";
 
@@ -143,7 +143,7 @@ namespace Src.Modules.User.Repository
                 using var conn = DatabaseConnection.GetConnection();
                 await conn.OpenAsync();
 
-                var query = @"SELECT id_usuario, nome, email, senha, perfil_usuario FROM usuario WHERE email = @email LIMIT 1";
+                var query = @"SELECT id_usuario, nome, email, senha, perfil FROM usuario WHERE email = @email LIMIT 1";
 
                 using var cmd = new NpgsqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("email", emailInput);

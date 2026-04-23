@@ -8,6 +8,7 @@ using Src.Modules.Ticket.Service;
 using Src.Modules.Message.Repository;
 using Src.Modules.Message.Service;
 using DotNetEnv;
+using Src.Shared.Authentication;
 
 namespace Src.Configurations;
 
@@ -50,6 +51,8 @@ public static class ApiConfig
 
         builder.Services.AddScoped<IMessageRepository, MessageRepository>();
         builder.Services.AddScoped<MessageService>();
+
+        builder.Services.AddScoped<AuthService>();
 
         builder.Services.AddSignalR();
     }
