@@ -42,7 +42,16 @@ namespace Src.Modules.User.Service
         {
             var senhaHash = _hasher.HashPassword(new UsuarioModel(), senha);
 
-            await _userRepository.Create(nome, email, senhaHash, perfil);
+            var usuario = new UsuarioModel
+            {
+                Nome = nome,
+                Email = email,
+                Senha = senhaHash,
+                Perfil = perfil,
+                DataHoraCriado = DateTimeOffset.UtcNow
+            };
+
+            await _userRepository.CreateAsync(usuario);
         }
 
 
@@ -50,13 +59,22 @@ namespace Src.Modules.User.Service
         {
             var senhaHash = _hasher.HashPassword(new UsuarioModel(), senha);
 
-            await _userRepository.Update(id, nome, email, senhaHash, perfil);
+            var usuario = new UsuarioModel
+            {
+                Id = id,
+                Nome = nome,
+                Email = email,
+                Senha = senha,
+                Perfil = perfil
+            };
+
+            await _userRepository.UpdateAsync(usuario);
         }
 
 
         public async Task DeleteUser(int id)
         {
-            await _userRepository.Delete(id);
+            await _userRepository.DeleteAsync(id);
         }
     }
 }

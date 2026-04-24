@@ -161,7 +161,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
 
     public async Task DeleteAsync(BigInteger Id)
     {
-        var sql = $"UPDATE {TableName} SET data_hora_deletado = NOW() WHERE {IdColumn} = @id";
+        var sql = $"UPDATE {TableName} SET data_hora_delecao = NOW() WHERE {IdColumn} = @id";
 
         using var conn = Connection;
         await conn.OpenAsync();
