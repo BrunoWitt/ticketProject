@@ -16,7 +16,7 @@ namespace Src.Shared.Authentication
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.PerfilUsuario.ToString()) 
+                new Claim(ClaimTypes.Role, user.Perfil.ToString()) 
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Env.GetString("SECRET_KEY")));
