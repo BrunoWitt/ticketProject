@@ -45,7 +45,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
     }
 
 
-    public async Task<TEntity?> GetByIdAsync(Guid Id)
+    public async Task<TEntity?> GetByIdAsync(int Id)
     {
         var query = $"SELECT * FROM {TableName} WHERE {IdColumn} = @id";
 
@@ -66,15 +66,21 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
 
     public async Task CreateAsync(TEntity entity)
     {
-        var props = typeof(TEntity).GetProperties();
+        var props = typeof(TEntity)
+            .GetProperties()
+            .Where(p => p.Name.ToLower() != "id");
 
         var columns = string.Join(", ", props.Select(p => ToSnakeCase(p.Name)));
+
         var values = string.Join(", ", props.Select(p =>
         {
             var column = ToSnakeCase(p.Name);
 
             if (p.PropertyType.IsEnum)
-                return "@" + column + "::perfil_usuario"; 
+            {
+                var enumTypeName = ToSnakeCase(p.PropertyType.Name);
+                return "@" + column + "::" + enumTypeName;
+            }
 
             return "@" + column;
         }));
@@ -92,13 +98,9 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
             var value = prop.GetValue(entity);
 
             if (value is Enum)
-            {
                 cmd.Parameters.AddWithValue(column, value.ToString());
-            }
             else
-            {
                 cmd.Parameters.AddWithValue(column, value ?? DBNull.Value);
-            }
         }
 
         await cmd.ExecuteNonQueryAsync();
@@ -109,23 +111,21 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
     {
         var props = typeof(TEntity).GetProperties();
 
-        var idProp = props.FirstOrDefault(p => 
-            ToSnakeCase(p.Name) == IdColumn);
-
+        var idProp = props.FirstOrDefault(p => p.Name.ToLower() == "id");
         if (idProp == null)
-            throw new Exception($"Id property '{IdColumn}' not found in entity");
+            throw new Exception("Id property not found");
 
-        var setClause = string.Join(", ", props
-            .Where(p => ToSnakeCase(p.Name) != IdColumn)
-            .Select(p =>
-            {
-                var column = ToSnakeCase(p.Name);
+        var setProps = props.Where(p => p.Name.ToLower() != "id");
 
-                if (p.PropertyType.IsEnum)
-                    return $"{column} = @{column}::perfil_usuario";
+        var setClause = string.Join(", ", setProps.Select(p =>
+        {
+            var column = ToSnakeCase(p.Name);
 
-                return $"{column} = @{column}";
-            }));
+            if (p.PropertyType.IsEnum)
+                return $"{column} = @{column}::" + GetEnumTypeName(p.PropertyType);
+
+            return $"{column} = @{column}";
+        }));
 
         var sql = $"UPDATE {TableName} SET {setClause} WHERE {IdColumn} = @id";
 
@@ -139,20 +139,10 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
             var column = ToSnakeCase(prop.Name);
             var value = prop.GetValue(entity);
 
-            if (column == IdColumn)
-            {
-                cmd.Parameters.AddWithValue("id", value);
-                continue;
-            }
-
-            if (value is Enum)
-            {
-                cmd.Parameters.AddWithValue(column, value.ToString());
-            }
+            if (prop.PropertyType.IsEnum)
+                cmd.Parameters.AddWithValue(column, value?.ToString() ?? (object)DBNull.Value);
             else
-            {
                 cmd.Parameters.AddWithValue(column, value ?? DBNull.Value);
-            }
         }
 
         await cmd.ExecuteNonQueryAsync();
@@ -184,7 +174,19 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
             if (!reader.HasColumn(name)) continue;
 
             var value = reader[name];
-            prop.SetValue(entity, value == DBNull.Value ? null : value);
+            if (value == DBNull.Value)
+                {
+                    prop.SetValue(entity, null);
+                }
+                else if (prop.PropertyType.IsEnum)
+                {
+                    var enumValue = Enum.Parse(prop.PropertyType, value.ToString()!, true);
+                    prop.SetValue(entity, enumValue);
+                }
+                else
+                {
+                    prop.SetValue(entity, value);
+                }
         }
 
         return entity;
@@ -196,6 +198,12 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
         return string.Concat(name.Select((x, i) =>
             i > 0 && char.IsUpper(x) ? "_" + x : x.ToString()
         )).ToLower();
+    }
+
+
+    private string GetEnumTypeName(Type enumType)
+    {
+        return ToSnakeCase(enumType.Name);
     }
 }
 

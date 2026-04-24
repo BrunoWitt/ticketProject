@@ -14,7 +14,7 @@ public enum StatusTicket
 public enum PrioridadeTicket
 {
     baixa,
-    média,
+    media,
     alta
 }
 
@@ -25,7 +25,7 @@ public class TicketModel : BaseModel
     public string? Descricao {get;set;}
     public StatusTicket Status {get; set;}
     public PrioridadeTicket Prioridade {get;set;}
-    public DateTimeOffset DataHoraFinalizado {get;set;}
+    public DateTimeOffset? DataHoraFinalizado {get;set;}
     public int? IdUsuario {get;set;}
     public int? IdAtendente {get;set;}
     public int? IdCategoria {get;set;}

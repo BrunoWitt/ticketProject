@@ -28,7 +28,7 @@ public class AssignTicketDTO
 
 public class TicketResponseDTO
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public string? Titulo { get; set; }
     public string? Descricao { get; set; }
     public StatusTicket Status { get; set; }

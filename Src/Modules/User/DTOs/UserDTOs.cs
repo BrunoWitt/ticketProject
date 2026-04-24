@@ -1,3 +1,4 @@
+using System.Numerics;
 using Src.Modules.User.Models;
 
 namespace Src.Modules.User.DTOs;

@@ -1,20 +1,11 @@
 using Src.Modules.Ticket.Models;
+using Src.Shared.Interfaces;
 
 namespace Src.Modules.Ticket.Repository
 {
-    public interface ITicketRepository
+    public interface ITicketRepository : IBaseRepository<TicketModel>
     {
-        Task Create(string Titulo, string Descricao, PrioridadeTicket Prioridade, int IdUsuario, int? IdCategoria);
-
-        Task<List<TicketModel>> GetAll();
-
-        Task<TicketModel?> GetById(int id);
-
-        Task Update(int Id, string? Titulo, string? Descricao, PrioridadeTicket? Prioridade);
-
         Task UpdateStatus(int idTicket, StatusTicket newStatus);
-
-        Task Delete(int id);
 
         Task Assign(int ticketId, int atendenteId);
     }
