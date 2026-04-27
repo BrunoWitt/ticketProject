@@ -26,7 +26,7 @@ public class TicketModel : BaseModel
     public StatusTicket Status {get; set;}
     public PrioridadeTicket Prioridade {get;set;}
     public DateTimeOffset? DataHoraFinalizado {get;set;}
-    public int? IdUsuario {get;set;}
-    public int? IdAtendente {get;set;}
-    public int? IdCategoria {get;set;}
+    public long? IdUsuario {get;set;}
+    public long? IdAtendente {get;set;}
+    public long? IdCategoria {get;set;}
 }

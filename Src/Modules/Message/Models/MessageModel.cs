@@ -4,7 +4,7 @@ namespace Src.Modules.Message.Models;
 
 public class MessageModel : BaseModel
 {
-    public string Texto { get; set; } = string.Empty;
+    public string? Texto { get; set; }
 
     public long IdUsuario { get; set; }
     public long IdTicket { get; set; }

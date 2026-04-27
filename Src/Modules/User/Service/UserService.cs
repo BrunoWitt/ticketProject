@@ -64,7 +64,7 @@ namespace Src.Modules.User.Service
                 Id = id,
                 Nome = nome,
                 Email = email,
-                Senha = senha,
+                Senha = senhaHash,
                 Perfil = perfil
             };
 

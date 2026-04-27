@@ -1,57 +1,65 @@
 using Src.Modules.Message.Models;
 using Src.Modules.Message.Repository;
+using Src.Shared.Base;
 
 namespace Src.Modules.Message.Service
 {
-    public class MessageService
+    public class MessageService 
+        : BaseService<MessageModel, CreateMessageDTO, UpdateMessageDTO>
     {
-        private readonly IMessageRepository _repo;
+        private readonly IMessageRepository _messageRepo;
 
-        public MessageService(IMessageRepository repo)
+        public MessageService(IMessageRepository repo) : base(repo)
         {
-            _repo = repo;
+            _messageRepo = repo;
         }
 
-        public async Task<MessageModel> SendMessage(string texto, int idUsuario, int idTicket)
+
+        protected override MessageModel MapCreate(CreateMessageDTO dto)
         {
-            var message = new MessageModel
+            return new MessageModel
             {
-                Texto = texto,
-                IdUsuario = idUsuario,
-                IdTicket = idTicket,
+                Texto = dto.Texto,
+                IdUsuario = dto.IdUsuario,
+                IdTicket = dto.IdTicket,
                 DataHoraCriado = DateTimeOffset.UtcNow
             };
-
-            await _repo.CreateAsync(message);
-
-            return message;
         }
 
 
-        public async Task<List<MessageModel>> GetMessagesByTicket(int idTicket)
+        protected override MessageModel MapUpdate(UpdateMessageDTO dto)
         {
-            return await _repo.GetByTicket(idTicket);
+            return new MessageModel
+            {
+                Id = dto.Id,
+                Texto = dto.Texto
+            };
         }
 
 
-        public async Task Anexo(int idMensagem, byte[] arquivo, string tipo)
+        public async Task<List<MessageModel>> GetMessagesByTicket(long idTicket)
+        {
+            return await _messageRepo.GetByTicket(idTicket);
+        }
+
+
+        public async Task Anexo(long idMensagem, byte[] arquivo, string tipo)
         {
             if (arquivo.Length > 5 * 1024 * 1024)
-                throw new Exception ("Arquivo muito grande");
+                throw new Exception("Arquivo muito grande");
 
-            await _repo.CreateAnexo(idMensagem, arquivo, tipo);
+            await _messageRepo.CreateAnexo(idMensagem, arquivo, tipo);
         }
 
 
-        public async Task<AnexoModel> GetAnexo(int id)
+        public async Task<AnexoModel> GetAnexo(long id)
         {
-            var anexo = await _repo.GetAnexo(id);
+            var anexo = await _messageRepo.GetAnexo(id);
 
             if (anexo == null)
                 throw new Exception("Anexo não encontrado");
 
             return anexo;
         }
-        
-    }   
+    }
 }

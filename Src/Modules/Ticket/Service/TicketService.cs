@@ -2,22 +2,21 @@ using Src.Modules.Ticket.Repository;
 using Src.Modules.Ticket.Models;
 using Src.Modules.Ticket.DTOs;
 using Src.Modules.User.Models;
+using Src.Shared.Base;
 using System.Numerics;
 
 namespace Src.Modules.Ticket.Service
 {
-    public class TicketService
+    public class TicketService 
+        : BaseService<TicketModel, CreateTicketDTO, UpdateTicketDTO>
     {
-        private readonly ITicketRepository _repo;
-
-        public TicketService(ITicketRepository repo)
+        public TicketService(ITicketRepository repo) : base(repo)
         {
-            _repo = repo;
         }
 
-        public async Task Create(CreateTicketDTO dto)
+        protected override TicketModel MapCreate(CreateTicketDTO dto)
         {
-            var ticket = new TicketModel
+            return new TicketModel
             {
                 Titulo = dto.Titulo,
                 Descricao = dto.Descricao,
@@ -25,51 +24,28 @@ namespace Src.Modules.Ticket.Service
                 IdUsuario = dto.IdUsuario,
                 IdCategoria = dto.IdCategoria,
                 Status = StatusTicket.aberto,
-                DataHoraCriado = DateTime.UtcNow
+                DataHoraCriado = DateTimeOffset.UtcNow
             };
-
-            await _repo.CreateAsync(ticket);
         }
 
-
-        public async Task<List<TicketModel>> GetAll()
-            => (await _repo.GetAllAsync()).ToList();
-
-        public async Task<TicketModel?> GetById(int id)
-            => await _repo.GetByIdAsync(id);
-
-        public async Task Update(UpdateTicketDTO dto)
+        protected override TicketModel MapUpdate(UpdateTicketDTO dto)
         {
-            var ticket = await _repo.GetByIdAsync(dto.Id);
-
-            if (ticket == null)
-                throw new Exception("Ticket não encontrado");
-
-            if (dto.Titulo != null)
-                ticket.Titulo = dto.Titulo;
-
-            if (dto.Descricao != null)
-                ticket.Descricao = dto.Descricao;
-
-            if (dto.Prioridade.HasValue)
-                ticket.Prioridade = dto.Prioridade.Value;
-
-            await _repo.UpdateAsync(ticket);
+            return new TicketModel
+            {
+                Id = dto.Id,
+                Titulo = dto.Titulo,
+                Descricao = dto.Descricao,
+                Prioridade = dto.Prioridade ?? PrioridadeTicket.media
+            };
         }
 
 
-        public async Task Delete(BigInteger id)
-        {
-            await _repo.DeleteAsync(id);
-        }
-
-
-        public async Task Assign(int idTicket, int idAtendente, int usuarioLogadoId, PerfilUsuario perfil)
+        public async Task Assign(long idTicket, long idAtendente, long usuarioLogadoId, PerfilUsuario perfil)
         {
             if (perfil != PerfilUsuario.atendente)
                 throw new Exception("Apenas atendentes podem assumir tickets");
 
-            var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
+            var ticket = await _repo.GetByIdAsync((int)idTicket);
 
             if (ticket == null)
                 throw new Exception("Ticket não encontrado");
@@ -87,9 +63,9 @@ namespace Src.Modules.Ticket.Service
         }
 
 
-        public async Task ChangeStatus(int idTicket, StatusTicket novoStatus, int userId, PerfilUsuario perfil)
+        public async Task ChangeStatus(long idTicket, StatusTicket novoStatus, long userId, PerfilUsuario perfil)
         {
-            var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
+            var ticket = await _repo.GetByIdAsync((int)idTicket);
 
             if (ticket == null)
                 throw new Exception("Ticket não encontrado");
@@ -108,10 +84,9 @@ namespace Src.Modules.Ticket.Service
             await _repo.UpdateAsync(ticket);
         }
 
-
-        public async Task Close(int idTicket, int userId, PerfilUsuario perfil)
+        public async Task Close(long idTicket, long userId, PerfilUsuario perfil)
         {
-            var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
+            var ticket = await _repo.GetByIdAsync((int)idTicket);
 
             if (ticket == null)
                 throw new Exception("Ticket não encontrado");
@@ -123,15 +98,15 @@ namespace Src.Modules.Ticket.Service
                 throw new Exception("Apenas o responsável pode fechar");
 
             ticket.Status = StatusTicket.fechado;
-            ticket.DataHoraFinalizado = DateTime.UtcNow;
+            ticket.DataHoraFinalizado = DateTimeOffset.UtcNow;
 
             await _repo.UpdateAsync(ticket);
         }
 
 
-        public async Task Reopen(int idTicket, int userId, PerfilUsuario perfil)
+        public async Task Reopen(long idTicket, long userId, PerfilUsuario perfil)
         {
-            var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
+            var ticket = await _repo.GetByIdAsync((int)idTicket);
 
             if (ticket == null)
                 throw new Exception("Ticket não encontrado");
@@ -164,7 +139,7 @@ namespace Src.Modules.Ticket.Service
 
             var deadline = ticket.DataHoraCriado.AddHours(limitHours);
 
-            return DateTime.UtcNow > deadline && ticket.Status != StatusTicket.fechado;
+            return DateTimeOffset.UtcNow > deadline && ticket.Status != StatusTicket.fechado;
         }
 
 
