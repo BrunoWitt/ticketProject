@@ -31,6 +31,7 @@ namespace Src.Modules.Ticket.Service
             await _repo.CreateAsync(ticket);
         }
 
+
         public async Task<List<TicketModel>> GetAll()
             => (await _repo.GetAllAsync()).ToList();
 
@@ -56,10 +57,12 @@ namespace Src.Modules.Ticket.Service
             await _repo.UpdateAsync(ticket);
         }
 
+
         public async Task Delete(BigInteger id)
         {
             await _repo.DeleteAsync(id);
         }
+
 
         public async Task Assign(int idTicket, int idAtendente, int usuarioLogadoId, PerfilUsuario perfil)
         {
@@ -83,6 +86,7 @@ namespace Src.Modules.Ticket.Service
             await _repo.UpdateAsync(ticket);
         }
 
+
         public async Task ChangeStatus(int idTicket, StatusTicket novoStatus, int userId, PerfilUsuario perfil)
         {
             var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
@@ -104,6 +108,7 @@ namespace Src.Modules.Ticket.Service
             await _repo.UpdateAsync(ticket);
         }
 
+
         public async Task Close(int idTicket, int userId, PerfilUsuario perfil)
         {
             var ticket = await _repo.GetByIdAsync((int)(object)idTicket);
@@ -122,6 +127,7 @@ namespace Src.Modules.Ticket.Service
 
             await _repo.UpdateAsync(ticket);
         }
+
 
         public async Task Reopen(int idTicket, int userId, PerfilUsuario perfil)
         {
@@ -145,6 +151,7 @@ namespace Src.Modules.Ticket.Service
             await _repo.UpdateAsync(ticket);
         }
 
+
         public bool ItsLate(TicketModel ticket)
         {
             var limitHours = ticket.Prioridade switch
@@ -159,6 +166,7 @@ namespace Src.Modules.Ticket.Service
 
             return DateTime.UtcNow > deadline && ticket.Status != StatusTicket.fechado;
         }
+
 
         public async Task<List<TicketResponseDTO>> GetAllWithSLA()
         {

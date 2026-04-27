@@ -18,10 +18,11 @@ namespace Src.Modules.Message.Service
             {
                 Texto = texto,
                 IdUsuario = idUsuario,
-                IdTicket = idTicket
+                IdTicket = idTicket,
+                DataHoraCriado = DateTimeOffset.UtcNow
             };
 
-            await _repo.Create(message);
+            await _repo.CreateAsync(message);
 
             return message;
         }

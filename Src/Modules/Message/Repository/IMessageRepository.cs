@@ -1,17 +1,12 @@
 using Src.Modules.Message.Models;
+using Src.Shared.Interfaces;
 
 namespace Src.Modules.Message.Repository
 {
-    public interface IMessageRepository
+    public interface IMessageRepository : IBaseRepository<MessageModel>
     {
-        Task Create(MessageModel message);
-
-        Task<List<MessageModel>> GetByTicket(int ticketId);
-
-        Task CreateAnexo(int idMensagem, byte[] arquivo, string tipo);
-
-        Task <AnexoModel?> GetAnexo(int id);
-
-        Task Delete(long id); 
+        Task<List<MessageModel>> GetByTicket(long ticketId);
+        Task CreateAnexo(long idMensagem, byte[] arquivo, string tipo);
+        Task<AnexoModel?> GetAnexo(long id);
     }
 }

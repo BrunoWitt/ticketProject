@@ -169,24 +169,44 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
 
         foreach (var prop in typeof(TEntity).GetProperties())
         {
-            var name = prop.Name.ToLower();
+            var columnName = ToSnakeCase(prop.Name);
 
-            if (!reader.HasColumn(name)) continue;
+            if (!reader.HasColumn(columnName)) continue;
 
-            var value = reader[name];
+            var value = reader[columnName];
+
             if (value == DBNull.Value)
+            {
+                prop.SetValue(entity, null);
+                continue;
+            }
+
+            var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+            try
+            {
+                if (targetType.IsEnum)
                 {
-                    prop.SetValue(entity, null);
-                }
-                else if (prop.PropertyType.IsEnum)
-                {
-                    var enumValue = Enum.Parse(prop.PropertyType, value.ToString()!, true);
+                    var enumValue = Enum.Parse(targetType, value.ToString()!, true);
                     prop.SetValue(entity, enumValue);
                 }
                 else
                 {
-                    prop.SetValue(entity, value);
+                    if (targetType == typeof(DateTimeOffset) && value is DateTime dt)
+                    {
+                        prop.SetValue(entity, new DateTimeOffset(dt));
+                    }
+                    else
+                    {
+                        var safeValue = Convert.ChangeType(value, targetType);
+                        prop.SetValue(entity, safeValue);
+                    }
                 }
+            }
+            catch
+            {
+                throw new Exception($"Erro ao converter coluna '{columnName}' ({value.GetType()}) para {targetType}");
+            }
         }
 
         return entity;
