@@ -37,6 +37,19 @@ namespace Src.Modules.Message.Service
         }
 
 
+        public async Task<MessageModel> SendMessage(string texto, long idUsuario, long idTicket)
+        {
+            var dto = new CreateMessageDTO
+            {
+                Texto = texto,
+                IdUsuario = idUsuario,
+                IdTicket = idTicket
+            };
+
+            return await Create(dto); 
+        }
+
+
         public async Task<List<MessageModel>> GetMessagesByTicket(long idTicket)
         {
             return await _messageRepo.GetByTicket(idTicket);
