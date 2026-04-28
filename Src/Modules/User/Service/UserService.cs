@@ -17,7 +17,7 @@ namespace Src.Modules.User.Service
         }
 
 
-        public async Task<UsuarioModel?> getUser(string Email, string Senha)
+        public async Task<UsuarioModel?> GetUser(string Email, string Senha)
         ///
         /// Usado pelo controller para verificar a existencia do usuário e devolver o modelo de usuario para o controller | controller junta isso com o jwt
         /// 

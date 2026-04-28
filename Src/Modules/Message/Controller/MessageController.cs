@@ -1,39 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Src.Modules.Message.Service;
 using Src.Modules.Message.Models;
+using Src.Shared.Base;
 
 namespace Src.Modules.Message.Controller
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class MessageController : ControllerBase
+    [Route("message")]
+    public class MessageController 
+        : BaseController<MessageModel, CreateMessageDTO, UpdateMessageDTO>
     {
         private readonly MessageService _service;
 
-        public MessageController(MessageService service)
+        public MessageController(MessageService service) : base(service)
         {
             _service = service;
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Send([FromBody] MenssageDTO dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Texto))
-                return BadRequest("Texto é obrigatório");
-
-            var message = await _service.SendMessage(
-                dto.Texto,
-                dto.IdUsuario,
-                dto.IdTicket
-            );
-
-            return Ok(message);
-        }
-
-
         [HttpGet("ticket/{idTicket}")]
-        public async Task<IActionResult> GetByTicket(int idTicket)
+        public async Task<IActionResult> GetByTicket(long idTicket)
         {
             var messages = await _service.GetMessagesByTicket(idTicket);
 
@@ -59,7 +45,7 @@ namespace Src.Modules.Message.Controller
 
 
         [HttpGet("anexo/{id}")]
-        public async Task<IActionResult> Download(int id)
+        public async Task<IActionResult> Download(long id)
         {
             var anexo = await _service.GetAnexo(id);
 

@@ -23,7 +23,7 @@ namespace Src.Modules.User.Controller
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDTO dto)
         {
-            var usuario = await _service.getUser(dto.Email, dto.Senha);
+            var usuario = await _service.GetUser(dto.Email, dto.Senha);
 
             if (usuario == null)
                 return Unauthorized("Email ou senha inválidos");
