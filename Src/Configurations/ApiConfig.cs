@@ -10,6 +10,8 @@ using Src.Modules.Message.Service;
 using DotNetEnv;
 using Src.Shared.Authentication;
 using Microsoft.OpenApi.Models;
+using Src.Modules.Category.Service;
+using Src.Modules.Category.Repository;
 
 namespace Src.Configurations;
 
@@ -79,6 +81,9 @@ public static class ApiConfig
 
         builder.Services.AddScoped<IMessageRepository, MessageRepository>();
         builder.Services.AddScoped<MessageService>();
+
+        builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddScoped<CategoryService>();
 
         builder.Services.AddScoped<AuthService>();
 
