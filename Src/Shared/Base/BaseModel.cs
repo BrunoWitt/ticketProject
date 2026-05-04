@@ -6,5 +6,5 @@ public abstract class BaseModel
 
     public DateTimeOffset DataHoraCriado {get;set;}
 
-    public DateTimeOffset DataHoraDelecao {get;set;}
+    public DateTimeOffset? DataHoraDelecao {get;set;}
 }

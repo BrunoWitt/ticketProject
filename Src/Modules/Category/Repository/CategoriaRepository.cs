@@ -10,5 +10,6 @@ namespace Src.Modules.Category.Repository
         }
 
         protected override string TableName => "categoria";
+        protected override string IdColumn => "id";
     }
 }
