@@ -4,16 +4,25 @@ using Src.Modules.Ticket.DTOs;
 using Src.Modules.User.Models;
 using Src.Shared.Base;
 using System.Numerics;
+using Src.Modules.Historico.Repository;
+using Src.Modules.Historico.Service;
+using Src.Modules.Historico.Models;
 
 namespace Src.Modules.Ticket.Service
 {
     public class TicketService 
         : BaseService<TicketModel, CreateTicketDTO, UpdateTicketDTO>
     {
-        public TicketService(ITicketRepository repo) : base(repo)
-        {
-        }
+        private readonly HistoricoService _historicoService;
 
+        public TicketService(
+            ITicketRepository repo,
+            HistoricoService historicoService
+        ) : base(repo) 
+        {
+            _historicoService = historicoService;
+        }
+        
         protected override TicketModel MapCreate(CreateTicketDTO dto)
         {
             return new TicketModel
@@ -79,7 +88,17 @@ namespace Src.Modules.Ticket.Service
             if (ticket.Status == StatusTicket.fechado)
                 throw new Exception("Ticket já está fechado");
 
+            var statusAnterior = ticket.Status;
+
             ticket.Status = novoStatus;
+
+            await _repo.UpdateAsync(ticket);
+
+            await _historicoService.RegistrarMudanca(
+                ticket.Id,
+                statusAnterior,
+                novoStatus
+            );
 
             await _repo.UpdateAsync(ticket);
         }
@@ -100,7 +119,18 @@ namespace Src.Modules.Ticket.Service
             ticket.Status = StatusTicket.fechado;
             ticket.DataHoraFinalizado = DateTimeOffset.UtcNow;
 
+            var statusAnterior = ticket.Status;
+
+            ticket.Status = StatusTicket.fechado;
+            ticket.DataHoraFinalizado = DateTime.UtcNow;
+
             await _repo.UpdateAsync(ticket);
+
+            await _historicoService.RegistrarMudanca(
+                ticket.Id,
+                statusAnterior,
+                StatusTicket.fechado
+            );
         }
 
 
@@ -123,7 +153,17 @@ namespace Src.Modules.Ticket.Service
             ticket.Status = StatusTicket.aberto;
             ticket.DataHoraFinalizado = null;
 
+            var statusAnterior = ticket.Status;
+
+            ticket.Status = StatusTicket.aberto;
+
             await _repo.UpdateAsync(ticket);
+
+            await _historicoService.RegistrarMudanca(
+                ticket.Id,
+                statusAnterior,
+                StatusTicket.aberto
+            );
         }
 
 

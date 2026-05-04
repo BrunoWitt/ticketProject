@@ -12,6 +12,10 @@ using Src.Shared.Authentication;
 using Microsoft.OpenApi.Models;
 using Src.Modules.Category.Service;
 using Src.Modules.Category.Repository;
+using Src.Modules.RefreshToken.Service;
+using Src.Shared.Middlewares;
+using Src.Modules.Historico.Service;
+using Src.Modules.Historico.Repository;
 
 namespace Src.Configurations;
 
@@ -85,6 +89,12 @@ public static class ApiConfig
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
         builder.Services.AddScoped<CategoryService>();
 
+        builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        builder.Services.AddScoped<RefreshTokenService>();
+
+        builder.Services.AddScoped<HistoricoService>();
+        builder.Services.AddScoped<IHistoricoRepository, HistoricoRepository>();
+
         builder.Services.AddScoped<AuthService>();
 
         builder.Services.AddSignalR();
@@ -95,6 +105,7 @@ public static class ApiConfig
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.UseRouting();
 
