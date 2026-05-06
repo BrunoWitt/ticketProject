@@ -33,5 +33,19 @@ public class TicketResponseDTO
     public string? Descricao { get; set; }
     public StatusTicket Status { get; set; }
     public PrioridadeTicket Prioridade { get; set; }
+    public long? IdCategoria {get;set;}
+    public long? IdAtendente {get;set;}
+    public DateTimeOffset DataHoraCriado {get;set;}
+    public DateTimeOffset? DataHoraFinalizado {get;set;}
     public bool Atrasado { get; set; }
+}
+
+
+public class PaginacaoDTO
+{
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public string? Search { get; set; }
+    public string? OrderBy { get; set; }
+    public string? OrderDir { get; set; }
 }

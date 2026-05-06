@@ -73,5 +73,13 @@ namespace Src.Modules.Ticket.Controller
 
             return Ok(new { message = "Ticket reaberto" });
         }
+
+
+        [HttpPost("paged")]
+        public async Task<IActionResult> GetPaged([FromBody] PaginacaoDTO dto)
+        {
+            var result = await _ticketService.GetPaged(dto);
+            return Ok(result);
+        }
     }
 }

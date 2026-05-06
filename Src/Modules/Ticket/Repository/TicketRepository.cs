@@ -3,6 +3,7 @@ using Src.Shared.DataBase;
 using Npgsql;
 using Microsoft.Extensions.Primitives;
 using Src.Shared.Base;
+using Src.Modules.Ticket.DTOs;
 
 namespace Src.Modules.Ticket.Repository
 {
@@ -48,6 +49,107 @@ namespace Src.Modules.Ticket.Repository
             cmd.Parameters.AddWithValue("idAtendente", idAtendente);
 
             await cmd.ExecuteNonQueryAsync();
+        }
+
+
+        public async Task<PageResult<TicketResponseDTO>> GetPaged(PaginacaoDTO request)
+        {
+            var offset = (request.Page - 1) * request.PageSize;
+
+            using var conn = Connection;
+            await conn.OpenAsync();
+
+            var where = "WHERE 1=1";
+            var parameters = new List<NpgsqlParameter>();
+
+            var search = request.Search?.Trim();
+
+            if (!string.IsNullOrEmpty(search) && search != "string")
+            {
+                where += @" AND (
+                    titulo ILIKE @search OR
+                    descricao ILIKE @search
+                )";
+
+                parameters.Add(new NpgsqlParameter("search", $"%{search}%"));
+            }
+
+            var orderBy = request.OrderBy?.ToLower() switch
+            {
+                "titulo" => "titulo",
+                "status" => "status",
+                "prioridade" => "prioridade",
+                _ => "id"
+            };
+
+            var orderDir = request.OrderDir?.ToLower() == "desc" ? "DESC" : "ASC";
+
+            var sql = $@"
+                SELECT *
+                FROM ticket
+                {where}
+                ORDER BY {orderBy} {orderDir}
+                LIMIT @limit OFFSET @offset;
+            ";
+
+            parameters.Add(new NpgsqlParameter("limit", request.PageSize));
+            parameters.Add(new NpgsqlParameter("offset", offset));
+
+            var data = new List<TicketResponseDTO>();
+
+            using (var cmd = new NpgsqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddRange(parameters.ToArray());
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    var ticket = Map(reader);
+
+                    data.Add(new TicketResponseDTO
+                    {
+                        Id = ticket.Id,
+                        Titulo = ticket.Titulo,
+                        Descricao = ticket.Descricao,
+                        Status = ticket.Status,
+                        Prioridade = ticket.Prioridade,
+                        IdCategoria = ticket.IdCategoria,
+                        IdAtendente = ticket.IdAtendente,
+                        DataHoraCriado = ticket.DataHoraCriado,
+                        DataHoraFinalizado = ticket.DataHoraFinalizado,
+                        Atrasado = false 
+                    });
+                }
+            }
+
+            var totalSql = $@"
+                SELECT COUNT(*)
+                FROM ticket
+                {where};
+            ";
+
+            var totalParams = parameters
+                .Where(p => p.ParameterName != "limit" && p.ParameterName != "offset")
+                .Select(p => new NpgsqlParameter(p.ParameterName, p.Value))
+                .ToArray();
+
+            int total;
+
+            using (var cmd = new NpgsqlCommand(totalSql, conn))
+            {
+                cmd.Parameters.AddRange(totalParams);
+
+                total = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+            }
+
+            return new PageResult<TicketResponseDTO>
+            {
+                Data = data,
+                Total = total,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
         }
     }
 }

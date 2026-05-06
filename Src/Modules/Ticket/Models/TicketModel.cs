@@ -30,3 +30,12 @@ public class TicketModel : BaseModel
     public long? IdAtendente {get;set;}
     public long? IdCategoria {get;set;}
 }
+
+
+public class PageResult<T>
+{
+    public List<T> Data { get; set; } = new();
+    public int Total { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}

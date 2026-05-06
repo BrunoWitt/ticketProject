@@ -14,12 +14,14 @@ namespace Src.Modules.Ticket.Service
         : BaseService<TicketModel, CreateTicketDTO, UpdateTicketDTO>
     {
         private readonly HistoricoService _historicoService;
+        private readonly ITicketRepository _ticketRepository;
 
         public TicketService(
             ITicketRepository repo,
             HistoricoService historicoService
-        ) : base(repo) 
+        ) : base(repo)
         {
+            _ticketRepository = repo;
             _historicoService = historicoService;
         }
         
@@ -194,8 +196,30 @@ namespace Src.Modules.Ticket.Service
                 Descricao = t.Descricao,
                 Status = t.Status,
                 Prioridade = t.Prioridade,
+                IdCategoria = t.IdCategoria,
+                IdAtendente = t.IdAtendente,
+                DataHoraCriado = t.DataHoraCriado,
+                DataHoraFinalizado = t.DataHoraFinalizado,
                 Atrasado = ItsLate(t)
             }).ToList();
+        }
+
+
+        public async Task<PageResult<TicketResponseDTO>> GetPaged(PaginacaoDTO request)
+        {
+            var result = await _ticketRepository.GetPaged(request);
+
+            foreach (var t in result.Data)
+            {
+                t.Atrasado = ItsLate(new TicketModel
+                {
+                    DataHoraCriado = t.DataHoraCriado,
+                    Status = t.Status,
+                    Prioridade = t.Prioridade
+                });
+            }
+
+            return result;
         }
     }
 }
