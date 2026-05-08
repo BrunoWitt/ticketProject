@@ -59,7 +59,7 @@ namespace Src.Modules.Ticket.Repository
             using var conn = Connection;
             await conn.OpenAsync();
 
-            var where = "WHERE 1=1";
+            var where = "WHERE data_hora_delecao IS NULL";
             var parameters = new List<NpgsqlParameter>();
 
             var search = request.Search?.Trim();
@@ -74,15 +74,39 @@ namespace Src.Modules.Ticket.Repository
                 parameters.Add(new NpgsqlParameter("search", $"%{search}%"));
             }
 
+            if (request.Status != null)
+            {
+                where += " AND status = CAST(@status AS status_ticket)";
+
+                parameters.Add(
+                    new NpgsqlParameter(
+                        "status",
+                        request.Status.ToString()
+                    )
+                );
+            }
+
+            if (request.IdCategoria != null || request.IdCategoria == 0)
+            {
+                where += " AND id_categoria = @idCategoria";
+
+                parameters.Add(
+                    new NpgsqlParameter("idCategoria", request.IdCategoria)
+                );
+            }
+
             var orderBy = request.OrderBy?.ToLower() switch
             {
                 "titulo" => "titulo",
                 "status" => "status",
                 "prioridade" => "prioridade",
+                "datahoracriado" => "data_hora_criado",
                 _ => "id"
             };
 
-            var orderDir = request.OrderDir?.ToLower() == "desc" ? "DESC" : "ASC";
+            var orderDir = request.OrderDir?.ToLower() == "desc"
+                ? "DESC"
+                : "ASC";
 
             var sql = $@"
                 SELECT *
@@ -118,7 +142,7 @@ namespace Src.Modules.Ticket.Repository
                         IdAtendente = ticket.IdAtendente,
                         DataHoraCriado = ticket.DataHoraCriado,
                         DataHoraFinalizado = ticket.DataHoraFinalizado,
-                        Atrasado = false 
+                        Atrasado = false
                     });
                 }
             }
@@ -130,7 +154,10 @@ namespace Src.Modules.Ticket.Repository
             ";
 
             var totalParams = parameters
-                .Where(p => p.ParameterName != "limit" && p.ParameterName != "offset")
+                .Where(p =>
+                    p.ParameterName != "limit" &&
+                    p.ParameterName != "offset"
+                )
                 .Select(p => new NpgsqlParameter(p.ParameterName, p.Value))
                 .ToArray();
 

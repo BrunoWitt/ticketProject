@@ -16,6 +16,7 @@ namespace Src.Modules.Category.Service
             return new CategoryModel
             {
                 Nome = dto.Nome!,
+                Cor = dto.Cor,
                 DataHoraCriado = DateTimeOffset.UtcNow
             };
         }

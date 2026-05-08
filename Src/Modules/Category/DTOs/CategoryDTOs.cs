@@ -1,6 +1,7 @@
 public class CreateCategoryDTO
 {
-    public string Nome { get; set; } = null!;
+    public string? Nome { get; set; } 
+    public string? Cor {get;set;}
 }
 
 public class UpdateCategoryDTO

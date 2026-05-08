@@ -48,4 +48,6 @@ public class PaginacaoDTO
     public string? Search { get; set; }
     public string? OrderBy { get; set; }
     public string? OrderDir { get; set; }
+    public long? IdCategoria { get; set; }
+    public StatusTicket? Status { get; set; }
 }
