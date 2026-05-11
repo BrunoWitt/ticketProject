@@ -34,7 +34,6 @@ namespace Src.Modules.User.Controller
             if (usuario == null)
                 return Unauthorized("Email ou senha inválidos");
 
-            // 🔥 NOVO: gera access + refresh
             var accessToken = await _authService.GenerateToken(usuario);
             var refreshToken = await _refreshService.Create(usuario.Id);
 

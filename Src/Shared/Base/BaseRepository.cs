@@ -194,7 +194,11 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
                 {
                     if (targetType == typeof(DateTimeOffset) && value is DateTime dt)
                     {
-                        prop.SetValue(entity, new DateTimeOffset(dt));
+                        prop.SetValue(entity,
+                            new DateTimeOffset(
+                                DateTime.SpecifyKind(dt, DateTimeKind.Utc)
+                            )
+                        );
                     }
                     else
                     {

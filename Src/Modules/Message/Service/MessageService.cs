@@ -1,16 +1,29 @@
 using Src.Modules.Message.Models;
 using Src.Modules.Message.Repository;
 using Src.Shared.Base;
+using Src.Modules.Ticket.Repository;
+using Src.Modules.User.Repository;
+
+using Src.Modules.User.Models;
+using Src.Modules.Ticket.Models;
 
 namespace Src.Modules.Message.Service
 {
     public class MessageService 
         : BaseService<MessageModel, CreateMessageDTO, UpdateMessageDTO>
     {
+        private readonly ITicketRepository _ticketRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMessageRepository _messageRepo;
 
-        public MessageService(IMessageRepository repo) : base(repo)
+        public MessageService(
+            IMessageRepository repo,
+            ITicketRepository ticketRepository,
+            IUserRepository userRepository
+        ) : base(repo)
         {
+            _ticketRepository = ticketRepository;
+            _userRepository = userRepository;
             _messageRepo = repo;
         }
 
@@ -37,8 +50,33 @@ namespace Src.Modules.Message.Service
         }
 
 
-        public async Task<MessageModel> SendMessage(string texto, long idUsuario, long idTicket)
+        public async Task<MessageModel> SendMessage(
+            string texto,
+            long idUsuario,
+            long idTicket
+        )
         {
+            var usuario = await _userRepository.GetByIdAsync((int)idUsuario);
+
+            if (usuario == null)
+                throw new Exception("Usuário não encontrado");
+
+            var ticket = await _ticketRepository.GetByIdAsync((int)idTicket);
+
+            if (ticket == null)
+                throw new Exception("Ticket não encontrado");
+
+            if (usuario.Perfil == PerfilUsuario.atendente)
+            {
+                ticket.Status = StatusTicket.aguardando;
+            }
+            else
+            {
+                ticket.Status = StatusTicket.em_andamento;
+            }
+
+            await _ticketRepository.UpdateAsync(ticket);
+
             var dto = new CreateMessageDTO
             {
                 Texto = texto,
@@ -46,7 +84,7 @@ namespace Src.Modules.Message.Service
                 IdTicket = idTicket
             };
 
-            return await Create(dto); 
+            return await Create(dto);
         }
 
 
