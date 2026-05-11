@@ -22,7 +22,7 @@ namespace Src.Modules.Ticket.Repository
             using var conn = DatabaseConnection.GetConnection();
             await conn.OpenAsync();
 
-            var query = @"UPDATE ticket SET status = @status WHERE id_ticket = @id";
+            var query = @"UPDATE ticket SET status = @status WHERE id = @id";
 
             using var cmd = new NpgsqlCommand(query, conn);
             cmd.Parameters.AddWithValue("id", id);
@@ -41,7 +41,7 @@ namespace Src.Modules.Ticket.Repository
                 UPDATE ticket
                 SET id_usuario_responsavel = @idAtendente,
                     status = 'em_andamento'
-                WHERE id_ticket = @idTicket;
+                WHERE id = @idTicket;
             ";
 
             using var cmd = new NpgsqlCommand(query, conn);

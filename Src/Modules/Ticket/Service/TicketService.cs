@@ -124,7 +124,7 @@ namespace Src.Modules.Ticket.Service
             var statusAnterior = ticket.Status;
 
             ticket.Status = StatusTicket.fechado;
-            ticket.DataHoraFinalizado = DateTime.UtcNow;
+            ticket.DataHoraFinalizado = DateTimeOffset.UtcNow;
 
             await _repo.UpdateAsync(ticket);
 

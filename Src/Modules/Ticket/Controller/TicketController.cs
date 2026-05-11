@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace Src.Modules.Ticket.Controller
 {
+    [ApiController]
     [Route("ticket")]
     public class TicketController 
         : BaseController<TicketModel, CreateTicketDTO, UpdateTicketDTO>
@@ -30,8 +31,17 @@ namespace Src.Modules.Ticket.Controller
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignTicketDTO dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var perfil = Enum.Parse<PerfilUsuario>(User.FindFirst(ClaimTypes.Role)!.Value);
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            if (idClaim == null)
+                throw new Exception("Claim NameIdentifier não encontrada");
+
+            if (roleClaim == null)
+                throw new Exception("Claim Role não encontrada");
+
+            var userId = int.Parse(idClaim.Value);
+            var perfil = Enum.Parse<PerfilUsuario>(roleClaim.Value);
 
             await _ticketService.Assign(dto.IdTicket, dto.IdAtendente, userId, perfil);
 

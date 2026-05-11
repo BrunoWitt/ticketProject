@@ -6,6 +6,7 @@ public enum StatusTicket
 {
     aberto,
     em_andamento,
+    aguardando,
     resolvido,
     fechado
 }
