@@ -4,24 +4,26 @@ using Src.Modules.User.DTOs;
 using Src.Modules.User.Service;
 using Src.Shared.Authentication;
 using Src.Modules.RefreshToken.Service;
+using Src.Shared.Base;
 
 namespace Src.Modules.User.Controller
 {
     [ApiController]
     [Route("user")]
-    public class UsuarioController : ControllerBase
+    public class UsuarioController
+        : BaseController<UsuarioModel, CreateUserDTO, UpdateUserDTO>
     {
-        private readonly UserService _service;
+        private readonly UserService _userService;
         private readonly AuthService _authService;
         private readonly RefreshTokenService _refreshService;
 
         public UsuarioController(
-            UserService service, 
+            UserService service,
             AuthService authService,
             RefreshTokenService refreshService
-        )
+        ) : base(service)
         {
-            _service = service;
+            _userService = service;
             _authService = authService;
             _refreshService = refreshService;
         }
@@ -29,7 +31,7 @@ namespace Src.Modules.User.Controller
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDTO dto)
         {
-            var usuario = await _service.GetUser(dto.Email, dto.Senha);
+            var usuario = await _userService.GetUser(dto.Email, dto.Senha);
 
             if (usuario == null)
                 return Unauthorized("Email ou senha inválidos");
@@ -43,27 +45,6 @@ namespace Src.Modules.User.Controller
                 refreshToken = refreshToken.Token,
                 usuario
             });
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO dto)
-        {
-            await _service.CreateUser(dto.Nome, dto.Email, dto.Senha, dto.PerfilUsuario);
-            return Ok("Usuário criado com sucesso");
-        }
-
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto)
-        {
-            await _service.UpdateUser(dto.Id, dto.Nome, dto.Email, dto.Senha, dto.PerfilUsuario);
-            return Ok("Usuário atualizado com sucesso");
-        }
-
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            await _service.DeleteUser(id);
-            return NoContent();
         }
     }
 }
